@@ -68,6 +68,12 @@ app.get("/", (req, res) => {
 app.get("/sign-up", (req, res) => res.render("sign-up-form"));
 
 app.post("/sign-up", (req, res, next) => {
+    // Hashes to add security
+    bcrypt.hash("somePassword", 10, (err, hashedPassword) => {
+        // if err, do something
+        // otherwise, store hashedPassword in DB
+    });
+    
     const user = new User({
         username: req.body.username,
         password: req.body.password,
@@ -82,9 +88,18 @@ app.post("/sign-up", (req, res, next) => {
 app.post(
     "/log-in",
     passport.authenticate("local", {
-      successRedirect: "/",
-      failureRedirect: "/"
+        successRedirect: "/",
+        failureRedirect: "/",
     })
-  );
+);
+
+app.get("/log-out", (req, res, next) => {
+    req.logout(function (err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect("/");
+    });
+});
 
 app.listen(3000, () => console.log("app listening on port 3000!"));
